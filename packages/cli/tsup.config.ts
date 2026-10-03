@@ -6,7 +6,7 @@ const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 
 export default defineConfig({
   entry: ['src/main.ts'],
   format: ['esm'],
-  target: 'node20',
+  target: 'node22',
   platform: 'node',
   clean: true,
   // Inline core and its deps so the built bin runs standalone (npx, CI images).

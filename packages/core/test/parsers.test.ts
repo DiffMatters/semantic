@@ -368,7 +368,7 @@ describe('env', () => {
       DB: { HOST: 'nested-two-levels', PORT: '5432' },
       TAGS: { '0': 'first', '1': 'second', '2': 'third' },
     });
-    expect(v('LEADING', 'SEP')).toBe('leading separator yields empty segment');
+    expect(v('LEADING_SEP')).toBe('leading separator yields empty segment');
     expect(v('TRAILING')).toBe('trailing separator yields empty segment');
     expect(v('TRIPLE', '_UNDERSCORE')).toMatch(/^ambiguous/);
     expect(v('SINGLE_UNDERSCORE_IS_NOT_NESTING')).toBe('true');
@@ -379,10 +379,10 @@ describe('env', () => {
     const dup = tricky.diagnostics.find((d) => d.code === 'DUPLICATE_KEY');
     expect(dup?.loc?.line).toBe(94);
     const empty = tricky.diagnostics.filter((d) => d.code === 'EMPTY_SEGMENT');
-    expect(empty.map((d) => d.loc?.line)).toEqual([60]);
+    expect(empty.map((d) => d.loc?.line)).toEqual([59, 60]);
     const malformed = tricky.diagnostics.filter((d) => d.code === 'MALFORMED_LINE');
     expect(malformed.map((d) => d.loc?.line)).toEqual([17]);
-    expect(codes(tricky).sort()).toEqual(['DUPLICATE_KEY', 'EMPTY_SEGMENT', 'MALFORMED_LINE']);
+    expect(codes(tricky).sort()).toEqual(['DUPLICATE_KEY', 'EMPTY_SEGMENT', 'EMPTY_SEGMENT', 'MALFORMED_LINE']);
   });
 
   it('separator null disables nesting; custom separators work', () => {
@@ -433,7 +433,7 @@ describe('env', () => {
   });
 
   it('BOM is stripped from the first key', () => {
-    const doc = load('malformed/bom.env');
+    const doc = load('edge/bom.env');
     expect(doc.source.startsWith('KEY')).toBe(true);
     expect(toJS(doc.root)).toEqual({ KEY: 'bom env' });
     expect(doc.root.kind === 'object' && doc.root.entries[0]?.keyLoc).toMatchObject({ line: 1, col: 1 });
@@ -463,7 +463,7 @@ describe('env', () => {
 });
 
 describe('malformed inputs fail cleanly', () => {
-  const parsesWithWarnings = new Set(['bad-lines.env', 'junk-after-quote.env', 'bom.env']);
+  const parsesWithWarnings = new Set(['bad-lines.env', 'junk-after-quote.env']);
   const failing = fixtureFiles('malformed').filter((f) => !parsesWithWarnings.has(f));
   const noLoc = new Set(['binary-garbage.bin']);
 
