@@ -1,32 +1,20 @@
 {
   "name": "config-diff",
-  "version": "0.1.0",
   "private": true,
+  "type": "module",
+  "workspaces": ["packages/core", "packages/cli", "apps/web"],
+  "engines": { "node": ">=20.9" },
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint"
-  },
-  "dependencies": {
-    "clsx": "^2.1.1",
-    "js-yaml": "^5.4.2",
-    "jsondiffpatch": "^0.7.6",
-    "lucide-react": "^1.51.0",
-    "next": "16.3.8",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "tailwind-merge": "^3.7.0"
+    "build:core": "npm run build -w @config-diff/core",
+    "build": "npm run build -w @config-diff/core && npm run build -w @config-diff/cli && npm run build -w @config-diff/web",
+    "dev": "npm run build:core && npm run dev -w @config-diff/web",
+    "test": "npm run build:core && npm test -w @config-diff/core && npm run build -w @config-diff/cli && npm test -w @config-diff/cli",
+    "typecheck": "npm run build:core && npm run typecheck -w @config-diff/core && npm run typecheck -w @config-diff/cli && npm run typecheck -w @config-diff/web",
+    "lint": "npm run lint -w @config-diff/web"
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/js-yaml": "^4.0.9",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "16.3.8",
-    "tailwindcss": "^4",
-    "typescript": "^5"
+    "@types/node": "^24",
+    "typescript": "^5.9.3",
+    "vitest": "^5.0.3"
   }
 }
