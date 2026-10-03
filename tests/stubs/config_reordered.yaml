@@ -1,0 +1,11 @@
+# This is a test config with different key order
+version: 1.0.0
+app_name: config-diff-app
+settings:
+  retry: 3
+  timeout: 30
+  debug: true
+features:
+  - auth
+  - logging
+  - metrics

@@ -8,37 +8,48 @@ export interface DriftResult {
 }
 
 /**
- * Specialized drift checker for environment comparisons.
- * Flattens nested objects into dot-notation keys for a table view.
+ * Recursively flattens a nested object into a flat map with dot-notation keys.
+ * Example: { settings: { timeout: 30 } } -> { "settings.timeout": 30 }
  */
-export function checkDrift(left: any, right: any): DriftResult[] {
-  const delta = computeSemanticDiff(left, right);
+function flattenObject(obj: any, prefix = ''): Record<string, any> {
+  const flat: Record<string, any> = {};
 
-  if (!delta) {
-    // Everything matches, but we still need to list all keys for the table
-    const allKeys = new Set([
-      ...Object.keys(left || {}),
-      ...Object.keys(right || {})
-    ]);
-
-    return Array.from(allKeys).map(key => ({
-      key,
-      leftValue: left?.[key],
-      rightValue: right?.[key],
-      status: 'match'
-    }));
+  if (obj === null || typeof obj !== 'object') {
+    return { [prefix]: obj };
   }
 
-  // For simplicity in V1, we flatten the objects to compare top-level keys
-  // A more robust version would recursively traverse the delta object
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const value = obj[key];
+      const newKey = prefix ? `${prefix}.${key}` : key;
+
+      if (value !== null && typeof value === 'object') {
+        Object.assign(flat, flattenObject(value, newKey));
+      } else {
+        flat[newKey] = value;
+      }
+    }
+  }
+
+  return flat;
+}
+
+/**
+ * Specialized drift checker for environment comparisons.
+ * Now performs a deep comparison by flattening nested objects into dot-notation keys.
+ */
+export function checkDrift(left: any, right: any): DriftResult[] {
+  const flatLeft = flattenObject(left);
+  const flatRight = flattenObject(right);
+
   const allKeys = new Set([
-    ...Object.keys(left || {}),
-    ...Object.keys(right || {})
+    ...Object.keys(flatLeft),
+    ...Object.keys(flatRight)
   ]);
 
-  return Array.from(allKeys).map(key => {
-    const leftVal = left?.[key];
-    const rightVal = right?.[key];
+  return Array.from(allKeys).sort().map(key => {
+    const leftVal = flatLeft[key];
+    const rightVal = flatRight[key];
 
     if (leftVal === undefined) return { key, leftValue: undefined, rightValue: rightVal, status: 'extra' };
     if (rightVal === undefined) return { key, leftValue: leftVal, rightValue: undefined, status: 'missing' };

@@ -1,0 +1,10 @@
+app_name: config-diff-app
+version: 1.0.0
+settings:
+  debug: true
+  timeout: 30
+  retry: 3
+features:
+  - auth
+  - logging
+  - metrics
