@@ -1,0 +1,7 @@
+{
+  "binary_tag": "R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5",
+  "custom_tag": "some-value",
+  "set_tag": { "a": null, "b": null },
+  "omap_tag": [{ "x": 1 }, { "y": 2 }],
+  "[complex, key]": "sequence as key (complex key; js-yaml rejects, yaml package stringifies)"
+}

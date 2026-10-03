@@ -1,0 +1,27 @@
+# Pair with falsy.a.json. Differences a -> b:
+#   zero: 0 -> false            (type-changed, both falsy)
+#   false: false -> 0           (type-changed)
+#   empty_string: "" -> null    (type-changed; equal-coerced only with emptyStringIsNull)
+#   null: null -> ""            (type-changed)
+#   empty_object: {} -> []      (type-changed)
+#   empty_array: [] -> {}       (type-changed)
+#   nested.*: identical         (must all be 'equal', never shown as missing)
+#   array_of_falsy: identical
+#   present_in_a_only_*: removed  (a null/0 value that is MISSING in b is 'removed', not 'equal')
+#   present_in_b_only_*: added
+zero: false
+"false": 0
+empty_string: null
+"null": ""
+empty_object: []
+empty_array: {}
+nested:
+  zero: 0
+  "false": false
+  empty_string: ""
+  "null": null
+  empty_object: {}
+  empty_array: []
+array_of_falsy: [0, false, "", null, {}, []]
+present_in_b_only_null: null
+present_in_b_only_false: false

@@ -1,0 +1,4 @@
+tests/stubs/edge/crlf.* -text
+tests/stubs/edge/bom.* -text
+tests/stubs/malformed/bom.* -text
+tests/stubs/malformed/binary-garbage.bin binary

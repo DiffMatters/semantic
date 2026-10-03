@@ -1,0 +1,16 @@
+# YAML tags whose support is parser-dependent.
+# js-yaml 5 (default schema) rejects !!binary/!!set/!!omap; js-yaml 4 accepted them.
+# The `yaml` package with the core schema reports unresolved tags.
+# Expected tool behaviour: parse, keep the raw scalar text as a string,
+# attach an UNKNOWN_TAG warning per tag, never throw.
+binary_tag: !!binary |
+  R0lGODlhDAAMAIQAAP//9/X17unp5WZmZgAAAOfn515eXvPz7Y6OjuDg4J+fn5
+custom_tag: !mytag some-value
+set_tag: !!set
+  ? a
+  ? b
+omap_tag: !!omap
+  - x: 1
+  - y: 2
+? [complex, key]
+: sequence as key (complex key; js-yaml rejects, yaml package stringifies)

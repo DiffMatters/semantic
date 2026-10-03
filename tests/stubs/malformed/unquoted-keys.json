@@ -1,0 +1,5 @@
+{
+  name: "unquoted key",
+  "single": 'single quoted string',
+  "comment": "ok" // not allowed in strict JSON
+}

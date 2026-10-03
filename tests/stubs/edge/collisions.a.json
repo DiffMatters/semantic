@@ -1,0 +1,20 @@
+{
+  "a": { "b": "nested a -> b" },
+  "a.b": "literal dotted key a.b",
+  "maxRetries": 3,
+  "max_retries": 4,
+  "max-retries": 5,
+  "MAX_RETRIES": 6,
+  "Timeout": 30,
+  "timeout": 60,
+  "items": { "0": "zero", "1": "one", "2": "two" },
+  "sparse": { "0": "zero", "2": "two" },
+  "not_an_array": { "0": "zero", "1": "one", "name": "x" },
+  "key with spaces": 1,
+  "key[with]brackets": 2,
+  "key\"with\"quotes": 3,
+  "": "empty key",
+  "ünïcödé": "unicode key",
+  "__proto__": "prototype pollution bait",
+  "constructor": "also bait"
+}

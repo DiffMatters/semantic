@@ -1,0 +1,22 @@
+# A YAML stream with three documents (Kubernetes style).
+# Expected: tool compares document #1 by default and warns "3 documents";
+# --yaml-doc 2 selects the second; --yaml-doc error refuses.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: orders-config
+  namespace: default
+data:
+  LOG_LEVEL: info
+  TIMEOUT: "30"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: orders-secret
+type: Opaque
+stringData:
+  DB_PASSWORD: hunter2
+---
+# third document is intentionally empty (parses as null)
+...

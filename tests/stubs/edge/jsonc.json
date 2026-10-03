@@ -1,0 +1,15 @@
+// JSON with comments and trailing commas (tsconfig / VS Code settings style).
+// Strict JSON.parse rejects this. A tolerant parser should accept it and
+// attach a NON_STANDARD_JSON warning.
+{
+  /* block comment */
+  "compilerOptions": {
+    "target": "ES2022", // trailing comment
+    "strict": true,
+    "paths": {
+      "@/*": ["./src/*", "./*"],
+    },
+  },
+  "include": ["**/*.ts", "**/*.tsx",],
+  "exclude": ["node_modules"],
+}
