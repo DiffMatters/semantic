@@ -6,7 +6,7 @@ import { diffNodes } from './diff/index.js';
 import { maskChanges } from './mask.js';
 import { resolveOptions } from './options.js';
 import { parse } from './parsers/index.js';
-import { evaluate, resolvePolicy, summarize, type PolicyName } from './policy/index.js';
+import { evaluate, isDifference, resolvePolicy, summarize, type PolicyName } from './policy/index.js';
 import type {
   DeepPartial,
   Document,
@@ -33,8 +33,6 @@ export interface CompareArgs {
   parse?: Pick<ParseOptions, 'env' | 'yaml'>;
 }
 
-const DIFFERENT = new Set(['added', 'removed', 'changed', 'type-changed', 'moved']);
-
 function info(doc: Document): DocumentInfo {
   const { root: _root, source: _source, ...rest } = doc;
   return rest;
@@ -52,19 +50,16 @@ export function compareDocuments(
   const { changes: raw, diagnostics } = diffNodes(left.root, right.root, opts);
   const changes = maskChanges(raw, opts);
   const findings = evaluate(changes, pol, opts.keys);
-  const leftInfo = info(left);
-  // Diff-time diagnostics (key collisions after folding, LCS fallback) belong to the comparison;
-  // attach them to the right side so they surface once.
-  const rightInfo = { ...info(right), diagnostics: [...right.diagnostics, ...diagnostics] };
   return {
-    left: leftInfo,
-    right: rightInfo,
+    left: info(left),
+    right: info(right),
     options: opts,
     policy: pol,
     changes,
     findings,
+    diagnostics,
     summary: summarize(changes, findings),
-    identical: !changes.some((c) => DIFFERENT.has(c.kind)),
+    identical: !changes.some((c) => isDifference(c.kind)),
   };
 }
 

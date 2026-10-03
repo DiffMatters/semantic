@@ -72,7 +72,7 @@ One page with two panes. Paste or drop a file into each, pick strict or loose an
 ## Development
 
 ```
-npm test           # core unit and golden tests, then CLI smoke tests
+npm test           # core unit and golden tests, CLI smoke tests, web view helpers
 npm run typecheck
 npm run lint
 npm run build

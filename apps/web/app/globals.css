@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens. Every color used by components is defined here and mapped to Tailwind
+ * through @theme inline (e.g. --added -> bg-added, text-added, border-added/30).
+ */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f7f5;
+  --foreground: #1b1c1f;
+  --surface: #ffffff;
+  --surface-2: #f0f0ed;
+  --muted: #676a72;
+  --border: #e2e2dd;
+  --border-strong: #c9c9c2;
+  --accent: #2f5bd3;
+  --accent-foreground: #ffffff;
+  --highlight: rgb(47 91 211 / 0.12);
+
+  --added: #1a7f37;
+  --removed: #c0262d;
+  --changed: #9a6700;
+  --type-changed: #8250df;
+  --moved: #0969da;
+  --coerced: #0e7c86;
+  --ignored: #6e7781;
+  --equal: #57606a;
+
+  --error: #c0262d;
+  --warn: #9a6700;
+  --success: #1a7f37;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0e1013;
+    --foreground: #e7e8ea;
+    --surface: #15181c;
+    --surface-2: #1c2026;
+    --muted: #9aa0aa;
+    --border: #2a2f37;
+    --border-strong: #3a414c;
+    --accent: #7aa2ff;
+    --accent-foreground: #0e1013;
+    --highlight: rgb(122 162 255 / 0.16);
+
+    --added: #3fb950;
+    --removed: #f85149;
+    --changed: #d29922;
+    --type-changed: #bc8cff;
+    --moved: #58a6ff;
+    --coerced: #39c5cf;
+    --ignored: #8b949e;
+    --equal: #8b949e;
+
+    --error: #f85149;
+    --warn: #d29922;
+    --success: #3fb950;
+  }
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-strong: var(--border-strong);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
+  --color-added: var(--added);
+  --color-removed: var(--removed);
+  --color-changed: var(--changed);
+  --color-type-changed: var(--type-changed);
+  --color-moved: var(--moved);
+  --color-coerced: var(--coerced);
+  --color-ignored: var(--ignored);
+  --color-equal: var(--equal);
+  --color-error: var(--error);
+  --color-warn: var(--warn);
+  --color-success: var(--success);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  color-scheme: light dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

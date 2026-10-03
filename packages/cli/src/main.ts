@@ -65,6 +65,10 @@ function printDiagnostics(report: Report): void {
       process.stderr.write(`${where}: ${d.severity}: ${d.message} [${d.code}]\n`);
     }
   }
+  for (const d of report.diagnostics) {
+    const line = d.loc ? ` (line ${d.loc.line})` : '';
+    process.stderr.write(`comparison: ${d.severity}: ${d.message}${line} [${d.code}]\n`);
+  }
 }
 
 export async function run(argv: string[]): Promise<number> {

@@ -68,6 +68,7 @@ export function toJson(report: Report, opts?: { pretty?: boolean }): string {
       path: f.change.path,
       pathText: f.change.pathText,
     })),
+    diagnostics: report.diagnostics.map(reduceDiagnostic),
     options: report.options,
     policy: report.policy,
   };

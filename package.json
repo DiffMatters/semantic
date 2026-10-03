@@ -8,7 +8,7 @@
     "build:core": "npm run build -w @config-diff/core",
     "build": "npm run build -w @config-diff/core && npm run build -w @config-diff/cli && npm run build -w @config-diff/web",
     "dev": "npm run build:core && npm run dev -w @config-diff/web",
-    "test": "npm run build:core && npm test -w @config-diff/core && npm run build -w @config-diff/cli && npm test -w @config-diff/cli",
+    "test": "npm run build:core && npm test -w @config-diff/core && npm run build -w @config-diff/cli && npm test -w @config-diff/cli && npm test -w @config-diff/web",
     "typecheck": "npm run build:core && npm run typecheck -w @config-diff/core && npm run typecheck -w @config-diff/cli && npm run typecheck -w @config-diff/web",
     "lint": "npm run lint -w @config-diff/web"
   },

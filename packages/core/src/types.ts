@@ -235,6 +235,8 @@ export interface Report {
   policy: Policy;
   changes: Change[];
   findings: Finding[];
+  /** Diagnostics produced by the comparison itself (key folding collisions, LCS fallback, duplicate array keys). */
+  diagnostics: Diagnostic[];
   summary: Summary;
   /** No added/removed/changed/type-changed/moved changes. Coerced equality still counts as identical. */
   identical: boolean;

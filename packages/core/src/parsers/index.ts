@@ -35,5 +35,7 @@ export function parse(text: string, opts: ParseOptions = {}): Document {
       return parseYaml(source, opts.name, opts.yaml);
     case 'env':
       return parseEnv(source, opts.name, opts.env);
+    default:
+      throw new ParseError(`unknown format "${String(format)}" (expected json, yaml or env)`, 'json', null, opts.name);
   }
 }

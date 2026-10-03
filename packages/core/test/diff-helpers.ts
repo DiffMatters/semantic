@@ -44,7 +44,7 @@ export function makeReport(
   const changes = maskChanges(d.changes, options);
   const findings = evaluate(changes, pol, options.keys);
   const summary = summarize(changes, findings);
-  const leftInfo: Report['left'] = { format: 'json', diagnostics: d.diagnostics };
+  const leftInfo: Report['left'] = { format: 'json', diagnostics: [] };
   const rightInfo: Report['right'] = { format: 'yaml', diagnostics: [] };
   if (names.left) leftInfo.name = names.left;
   if (names.right) rightInfo.name = names.right;
@@ -55,6 +55,7 @@ export function makeReport(
     policy: pol,
     changes,
     findings,
+    diagnostics: d.diagnostics,
     summary,
     identical: !changes.some((c) => isDifference(c.kind)),
   };
