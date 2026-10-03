@@ -1,0 +1,79 @@
+# Scalar typing edge cases. Pair with types.json: both files have the same 55 keys.
+# The "js-yaml 5.4.2" column is OBSERVED behaviour of the parser currently in this
+# repo (yaml.load, default schema), which already follows YAML 1.2 core rules for
+# most scalars. The "expected" column is what a semantic config diff should treat
+# the value as when comparing against types.json (loose mode).
+#                                js-yaml 5.4.2 observed     expected vs types.json
+int_plain: 42                  # 42                         equal
+int_negative: -17              # -17                        equal
+int_underscore: 1_000_000      # string "1_000_000"         type-changed vs 1000000 (strict), coercible only with a digit-separator rule
+int_hex: 0x1F                  # 31                         equal
+int_octal_legacy: 0755         # 755 (decimal!)             json has string "0755": raw text must be kept so this is reported honestly
+int_octal_12: 0o755            # 493                        equal
+int_big: 9007199254740993      # 9007199254740992 (precision lost)   must compare by raw digits -> equal
+float_plain: 3.14              # 3.14                       equal
+float_exp: 1e3                 # 1000                       equal
+float_exp_dot: 1.0e+3          # 1000                       equal
+float_trailing_zero: 1.0       # 1                          equal to json 1 (numeric equality)
+float_inf: .inf                # Infinity                   json has string "Infinity": type-changed (JSON cannot encode it)
+float_neg_inf: -.inf           # -Infinity                  type-changed
+float_nan: .nan                # NaN                        type-changed; NaN must never compare unequal to itself
+neg_zero: -0                   # 0 (raw "-0")               equal to json -0
+bool_true: true
+bool_yes: yes                  # string "yes"               json has true: equal-coerced only with legacyYamlBooleans
+bool_on: on                    # string "on"                json has string "on": equal
+bool_y: y                      # string "y"                 equal
+bool_false_caps: FALSE         # false                      equal
+null_tilde: ~                  # null                       equal
+null_word: null
+null_empty:                    # null                       equal
+null_string: "null"            # string "null"              equal (both strings); never coerced to null when both sides are strings
+version_like: 1.10             # float 1.1 (data loss!)     json has "1.10": raw must be kept; strict: type-changed; loose: equal via raw
+version_quoted: "1.10"
+date_plain: 2024-01-15         # string                     equal
+timestamp_plain: 2024-01-15T10:30:00Z   # string            equal
+date_quoted: "2024-01-15"
+time_like: 12:30:45            # string "12:30:45"          equal
+zip_leading_zero: 02134        # 2134 (leading zero lost)   json has "02134": raw must be kept
+phone: +49 30 1234567          # string                     equal
+str_plain: hello world
+str_single: 'it''s single'
+str_double: "tab\there é \"quoted\""
+str_empty: ""
+str_space: " "
+str_colon: "key: value"
+str_hash: "value # not a comment"
+str_unicode: "Grüße, 世界 🚀"
+str_long_number: "00123456789012345678901234567890"
+block_literal: |
+  line one
+  line two
+block_literal_strip: |-
+  no trailing newline
+block_folded: >
+  folded
+  into one line
+block_folded_keep: >+
+  keep trailing
+
+123: numeric key               # key becomes the string "123"
+true: boolean key              # key becomes the string "true"
+"quoted.key": dotted key quoted
+a.b: dotted key plain          # ONE key containing a dot, not a nested path
+nested:
+  anchors: &anchor
+    one: 1
+    two: 2
+  alias: *anchor               # resolved to a copy of anchors
+  merged:
+    <<: *anchor                # js-yaml 5 does NOT apply merge keys: literal "<<" key remains. The `yaml` package needs merge: true.
+    two: 22
+    three: 3
+empty_map: {}
+empty_seq: []
+flow_map: { a: 1, b: [1, 2, { c: 3 }] }
+flow_seq: [1, "two", 3.0, true, null, ~, [nested]]
+multiline_flow: [
+  one,
+  two,
+  ]

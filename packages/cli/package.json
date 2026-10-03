@@ -1,0 +1,16 @@
+{
+  "name": "@config-diff/cli",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "bin": { "config-diff": "dist/main.js" },
+  "engines": { "node": ">=22.4" },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": { "@config-diff/core": "0.1.0" },
+  "devDependencies": { "tsup": "^8.5.1" }
+}

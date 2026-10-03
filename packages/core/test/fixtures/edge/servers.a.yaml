@@ -1,0 +1,32 @@
+# Arrays of objects, to exercise array matching strategies.
+# Pair with servers.b.yaml.
+servers:
+  - name: web
+    host: web.internal
+    port: 80
+    roles: [http, static]
+  - name: api
+    host: api.internal
+    port: 8080
+    roles: [http, grpc]
+  - name: worker
+    host: worker.internal
+    port: 9000
+    roles: [queue]
+  - name: cron
+    host: cron.internal
+    port: 9001
+    roles: [queue]
+# items without the key field (keyed strategy must fall back gracefully)
+unkeyed:
+  - host: a.internal
+  - host: b.internal
+# duplicate key values (keyed strategy must warn, not crash)
+duplicates:
+  - name: dup
+    value: 1
+  - name: dup
+    value: 2
+# plain scalar list with repeats (set strategy multiset semantics)
+tags: [a, a, b, c]
+ordered_steps: [build, test, deploy]

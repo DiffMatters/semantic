@@ -1,0 +1,37 @@
+# Pair with servers.a.yaml. Changes:
+#   servers: reordered (api first); web.port 80 -> 8080; worker removed; db added;
+#            api.roles gains "metrics" (ordered vs set strategy both see one addition)
+#   With --array servers=keyed:name the tool must report
+#     servers[name=web].port changed, servers[name=worker] removed, servers[name=db] added
+#   and NOT a positional mess of 4 changed rows.
+#   unkeyed: order swapped (ordered: moved; set: equal)
+#   duplicates: identical (keyed must warn about duplicate key "dup")
+#   tags: [a, a, b, c] -> [a, b, c]   (set/multiset: one 'a' removed; naive set: equal)
+#   ordered_steps: [build, test, deploy] -> [test, build, deploy] (ordered: moved; set: equal)
+servers:
+  - name: api
+    host: api.internal
+    port: 8080
+    roles: [http, grpc, metrics]
+  - name: web
+    host: web.internal
+    port: 8080
+    roles: [http, static]
+  - name: cron
+    host: cron.internal
+    port: 9001
+    roles: [queue]
+  - name: db
+    host: db.internal
+    port: 5432
+    roles: [storage]
+unkeyed:
+  - host: b.internal
+  - host: a.internal
+duplicates:
+  - name: dup
+    value: 1
+  - name: dup
+    value: 2
+tags: [a, b, c]
+ordered_steps: [test, build, deploy]

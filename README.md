@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# config-diff
 
-## Getting Started
+Semantic comparison of configuration files across JSON, YAML and `.env`.
+It answers three questions:
 
-First, run the development server:
+- **Same service, two environments.** What really differs between `staging.yaml` and `prod.yaml`, ignoring key order, formatting and comments?
+- **Cross-format equivalence.** Does `config.json` say the same thing as its `.env` or YAML translation, where `"8080"` and `8080` or `SERVER__PORT` and `server.port` mean the same?
+- **Drift against a baseline.** Which keys are missing, extra or of the wrong type compared to a reference config, and should that fail CI?
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+The same core library powers a CLI and a web page.
+
+## How it works
+
+1. **Parse into a typed tree.** Every value keeps its type, its exact source text and its line and column. So `version: 1.10` is still reported as `1.10`, not `1.1`, and every change points at a line.
+2. **Normalize under explicit rules.**
+   - **Strict mode** compares types and keys exactly.
+   - **Loose mode** folds key spelling, so `maxRetries` matches `MAX_RETRIES`. It also treats `"true"` and `true`, `"30"` and `30`, `"a,b"` and `[a, b]`, and `SERVICES__0__NAME` and `services[0].name` as equal. Each forgiven difference is recorded as *equal after coercion*, never hidden.
+3. **Diff the trees.** Array matching is chosen per path:
+   - **ordered** detects moves.
+   - **set** ignores order.
+   - **keyed** matches items by a field, e.g. `services[name=payments].timeout_ms`.
+4. **Evaluate a policy.** A policy decides which changes are errors or warnings. The exit code follows from that.
+5. **Mask secrets.** Values under keys like `password`, `token` and `api_key`, and credentials inside URLs, are masked in all output. Masked values are still compared.
+
+## CLI
+
+```
+npm install
+npm run build
+node packages/cli/dist/main.js <left> <right> [options]     # Node >= 22.4
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```
+config-diff app.base.json app.prod.yaml --array services=keyed:name
+config-diff app.prod.yaml app.prod.env --mode loose -o markdown
+config-diff baseline.yaml live.yaml --policy strict-ci --fail-on warn -o github
+cat live.json | config-diff baseline.yaml -
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Option | Meaning |
+|---|---|
+| `--mode strict\|loose` | Loose is the default. |
+| `--format`, `--left-format`, `--right-format` | Override format detection. |
+| `--env-separator __\|none` | Nesting separator for `.env` keys. |
+| `--array <pattern>=ordered\|set\|keyed:<field>` | Array matching per path. Repeatable. |
+| `--ignore <pattern>` | Skip paths. Repeatable. Patterns support `*`, `**` and `[n]`. |
+| `--policy drift\|equivalence\|strict-ci\|file.json` | Map changes to errors and warnings. |
+| `--fail-on error\|warn\|any\|never` | Exit 1 threshold. |
+| `-o table\|json\|markdown\|github` | Output format. |
+| `--show diff\|all` | Include equal rows. |
+| `--[no-]mask` | Secret masking. On by default. |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Exit codes: `0` clean, `1` findings at the `--fail-on` level, `2` usage or parse error. Errors are printed as `file:line:col: message`.
 
-## Learn More
+## Web
 
-To learn more about Next.js, take a look at the following resources:
+```
+npm run dev        # builds core, then starts Next on http://localhost:3000
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+One page with two panes. Paste or drop a file into each, pick strict or loose and a scenario preset, and read the change list. Clicking a row jumps to the line in both panes. Comparison runs in the browser; nothing is uploaded.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Layout
 
-## Deploy on Vercel
+| Path | Contents |
+|---|---|
+| `packages/core` | Parsers, normalization, diff, policy, renderers. Pure TypeScript, no DOM or Node APIs. |
+| `packages/cli` | The `config-diff` command, bundled with tsup. |
+| `apps/web` | Next.js 16 app. |
+| `packages/core/test/fixtures` | Realistic, edge-case and malformed inputs. Their README states the expected result for each file. |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+npm test           # core unit and golden tests, CLI smoke tests, web view helpers
+npm run typecheck
+npm run lint
+npm run build
+```

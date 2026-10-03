@@ -1,0 +1,5 @@
+key: value
+key: duplicate
+nested:
+  x: 1
+  x: 2

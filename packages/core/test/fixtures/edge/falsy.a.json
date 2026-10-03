@@ -1,0 +1,19 @@
+{
+  "zero": 0,
+  "false": false,
+  "empty_string": "",
+  "null": null,
+  "empty_object": {},
+  "empty_array": [],
+  "nested": {
+    "zero": 0,
+    "false": false,
+    "empty_string": "",
+    "null": null,
+    "empty_object": {},
+    "empty_array": []
+  },
+  "array_of_falsy": [0, false, "", null, {}, []],
+  "present_in_a_only_null": null,
+  "present_in_a_only_zero": 0
+}

@@ -1,0 +1,8 @@
+[
+  {"name": "a", "value": 1},
+  {"name": "b", "value": 2},
+  "mixed scalar",
+  42,
+  null,
+  [1, 2]
+]

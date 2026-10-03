@@ -1,0 +1,108 @@
+# Staging configuration for orders-service.
+# Semantically identical to app.base.json; key order, formatting and
+# syntax differ on purpose (anchors, merge keys, YAML 1.1 bool spellings,
+# unquoted version/date/octal scalars). A correct tool in loose mode
+# should report this file as equal to app.base.json, and a strict YAML 1.2
+# parser must NOT turn "1.10" into 1.1 or "2024-01-15" into a Date.
+
+version: 1.10          # unquoted: YAML 1.1 loads float 1.1, YAML 1.2 core loads float 1.1 too -> must be quoted to be safe
+app_name: orders-service
+release_date: 2024-01-15   # unquoted: YAML 1.1 schema loads a Date, core schema keeps a string
+environment: staging
+
+defaults: &pool_defaults
+  min: 2
+  max: 10
+  idle_timeout_s: 300
+
+server:
+  port: 8080
+  host: 0.0.0.0
+  tls: no                # YAML 1.1 boolean spelling; a string "no" in YAML 1.2
+  read_timeout_ms: 30000
+  max_body_bytes: 10485760
+  cors:
+    allowed_methods: [GET, POST, PUT, DELETE]
+    enabled: yes
+    allowed_origins:
+      - https://app.example.com
+      - https://admin.example.com
+
+database:
+  driver: postgres
+  host: db.staging.internal
+  port: 5432
+  name: orders
+  user: orders_rw
+  password: "s3cr3t-staging-pw"
+  ssl_mode: require
+  pool:
+    <<: *pool_defaults
+
+redis:
+  url: redis://cache.staging.internal:6379/0
+  ttl_s: 600
+
+logging:
+  format: json
+  level: debug
+  sinks:
+    - stdout
+    - file
+  file:
+    path: /var/log/orders.log
+    max_size_mb: 100
+    rotate: 5
+
+features:
+  new_checkout: on
+  beta_search: off
+  dark_mode: ~
+
+rate_limits:
+  per_ip: { requests: 1000, window_s: 3600 }
+  default: { requests: 100, window_s: 60 }
+
+services:
+  - name: payments
+    url: https://payments.staging.internal
+    timeout_ms: 5000
+    retries: 3
+  - name: inventory
+    url: https://inventory.staging.internal
+    timeout_ms: 2000
+    retries: 1
+  - name: notifications
+    url: https://notify.staging.internal
+    timeout_ms: 1000
+    retries: 0
+
+integrations:
+  stripe:
+    api_key: sk-test-FAKE-KEY-FOR-TESTS-ONLY
+    webhook_secret: whsec_xxxxxxxxxxxxxxxx
+  sentry:
+    dsn: https://abc123@o0.ingest.sentry.io/0
+    sample_rate: 0.25
+
+maintenance_window: ""
+tags: []
+metadata: {}
+legacy.setting: dotted-key-value
+allowed_ips:
+  - 10.0.0.0/8
+  - 192.168.1.0/24
+
+scale:
+  cpu_limit: 1.5
+  memory_mb: 512
+  min_replicas: 1
+  max_replicas: 3
+  scale_factor: 1e3      # YAML 1.1 reads this as a STRING, YAML 1.2 core as the number 1000
+
+greeting: "Hello, 世界 — ünïcödé ✓"
+file_mode: 0755          # unquoted: YAML 1.1 octal int 493, YAML 1.2 core keeps the string "0755"
+zip_code: 02134          # leading zero: int 2134 (1.1) or string (1.2)
+notes: |
+  line one
+  line two
